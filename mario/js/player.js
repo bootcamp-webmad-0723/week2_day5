@@ -1,28 +1,28 @@
 class Player {
 
-  constructor(gameScreen, gameSize, keys) {
+  constructor(gameScreen, gameSize) {
 
     this.gameScreen = gameScreen;
     this.gameSize = gameSize;
-    this.keys = keys;
     this.bullets = [];
 
     this.playerSize = {
       w: 100,
       h: 100
     }
+
     this.playerPos = {
       left: 50,
       top: this.gameSize.h - this.playerSize.h - 20,
       base: this.gameSize.h - this.playerSize.h - 20,
     }
+
     this.playerVel = {
       left: 1,
       top: 0,
       gravity: 0.4
     }
 
-    this.setEventListeners()
     this.init()
   }
 
@@ -42,7 +42,7 @@ class Player {
 
   move() {
 
-    if (this.playerPos.top < this.playerPos.base) {
+    if (this.playerPos.top < this.playerPos.base) {       // está saltando!
       this.playerPos.top += this.playerVel.top;
       this.playerVel.top += this.playerVel.gravity;
     } else {
@@ -58,23 +58,6 @@ class Player {
   updatePosition() {
     this.playerElement.style.left = `${this.playerPos.left}px`
     this.playerElement.style.top = `${this.playerPos.top}px`
-  }
-
-  setEventListeners() {
-
-    document.addEventListener("keydown", e => {
-
-      switch (e.keyCode) {
-        case this.keys.TOP:
-          if (this.playerPos.top >= this.playerPos.base) {
-            this.jump()
-          }
-          break;
-        case this.keys.SPACE:
-          this.shoot();
-          break;
-      }
-    })
   }
 
   jump() {

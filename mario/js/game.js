@@ -10,10 +10,13 @@ const Game = {
   player: undefined,
   obstacles: [],
 
-  keys: { TOP: 38, SPACE: 32 },
+  obstacleDensity: 80,
+
+  keys: { TOP: 'ArrowUp', SPACE: 'Space' },
 
   init() {
     this.setDimensions()
+    this.setEventListeners()
     this.start()
   },
 
@@ -22,12 +25,31 @@ const Game = {
     this.gameScreen.style.height = `${this.gameSize.h}px`
   },
 
-  start() {
-    this.background = new Background(this.gameScreen, this.gameSize)
-    this.player = new Player(this.gameScreen, this.gameSize, this.keys)
-    this.obstacles = []
+  setEventListeners() {
 
+    document.addEventListener("keydown", e => {
+      switch (e.code) {
+        case this.keys.TOP:
+          if (this.player.playerPos.top >= this.player.playerPos.base) {
+            this.player.jump()
+          }
+          break;
+        case this.keys.SPACE:
+          this.player.shoot()
+          break;
+      }
+    })
+  },
+
+  start() {
+    this.createElements()
     this.gameLoop()
+  },
+
+  createElements() {
+    this.background = new Background(this.gameScreen, this.gameSize)
+    this.player = new Player(this.gameScreen, this.gameSize)
+    this.obstacles = []
   },
 
 
@@ -35,26 +57,26 @@ const Game = {
     this.framesCounter > 5000 ? this.framesCounter = 0 : this.framesCounter++
 
     this.drawAll()
+    this.clearAll()
 
     this.generateObstacles()
-    this.clearObstacles()
     this.isCollision() && this.gameOver()
     window.requestAnimationFrame(() => this.gameLoop())
   },
 
   drawAll() {
     this.background.move()
-    this.player.move(this.framesCounter)
+    this.player.move()
     this.obstacles.forEach(obs => obs.move())
   },
 
   generateObstacles() {
-    if (this.framesCounter % 80 === 0) {
+    if (this.framesCounter % this.obstacleDensity === 0) {
       this.obstacles.push(new Obstacle(this.gameScreen, this.gameSize, this.player.playerPos, this.player.playerSize))
     }
   },
 
-  clearObstacles() {
+  clearAll() {
     this.obstacles.forEach((obs, idx) => {
       if (obs.obstaclePos.left <= 0) {
         obs.obstacleElement.remove()
